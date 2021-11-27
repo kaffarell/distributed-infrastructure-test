@@ -1,20 +1,26 @@
-#![feature(proc_macro_hygiene, decl_macro)]
-
-#[macro_use] extern crate rocket;
-
-use rocket::http::Status;
+use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
 
 
-#[get("/info/<id>")]
-fn info(id: i32) -> String {
-    return format!("Info of user with id: {}", id);
+#[get("/info/{id}")]
+async fn info(id: web::Path<i32>) -> impl Responder {
+    HttpResponse::Ok().body(format!("Info of user with id: {}", id))
 }
 
 #[get("/health")]
-fn health() -> Status {
-    return Status::Ok;
+async fn health() -> impl Responder {
+    println!("Health check OK!");
+    return HttpResponse::Ok();
 }
 
-fn main() {
-    rocket::ignite().mount("/", routes![info, health]).launch();
+
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    HttpServer::new(|| {
+        App::new()
+            .service(info)
+            .service(health)
+    })
+    .bind("127.0.0.1:8000")?
+    .run()
+    .await
 }
