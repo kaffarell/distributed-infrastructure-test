@@ -1,8 +1,8 @@
 FROM rustlang/rust:nightly as builder
 
 # Create a new cargo project
-RUN USER=root cargo new --bin ms-user-info
-WORKDIR ./ms-user-info
+RUN USER=root cargo new --bin user-info-service
+WORKDIR ./user-info-service
 # Copy only the Cargo.toml file and install the dependencies
 COPY ./Cargo.toml ./Cargo.toml
 RUN cargo build --release
@@ -13,7 +13,8 @@ ADD . ./
 
 # Remove the binary of the application build previously (without our code)
 # The binaries of the dependencies stay
-RUN rm ./target/release/deps/ms_user_info*
+# Attention rust converts the name of the binaries from - to _ 
+RUN rm ./target/release/deps/user_info_service*
 
 # Make another build with our code
 RUN cargo build --release
@@ -36,7 +37,7 @@ RUN groupadd $APP_USER \
     && mkdir -p ${APP}
 
 # Copy the final executable from the builder to the debian instance
-COPY --from=builder /ms-user-info/target/release/ms-user-info ${APP}/ms-user-info
+COPY --from=builder /user-info-service/target/release/user-info-service ${APP}/user-info-service
 
 # Set exetutable bit for user
 RUN chown -R $APP_USER:$APP_USER ${APP}
@@ -44,4 +45,4 @@ RUN chown -R $APP_USER:$APP_USER ${APP}
 USER $APP_USER
 WORKDIR ${APP}
 
-CMD ["./ms-user-info"]
+CMD ["./user-info-service"]

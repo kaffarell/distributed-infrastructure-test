@@ -1,8 +1,8 @@
 version: "3.9"
 
 services:
-  ms-user-info:
-    build: ./ms-user-info/
+  user-info-service:
+    build: ./user-info-service/
     ports: 
       - "8000:8000"
   redis:

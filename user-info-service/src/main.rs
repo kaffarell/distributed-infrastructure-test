@@ -15,12 +15,13 @@ async fn health() -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    println!("Starting Server on Port: 8000");
     HttpServer::new(|| {
         App::new()
             .service(info)
             .service(health)
     })
-    .bind("127.0.0.1:8000")?
+    .bind("0.0.0.0:8000")?
     .run()
     .await
 }
